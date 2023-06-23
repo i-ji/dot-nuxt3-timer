@@ -1,6 +1,8 @@
 <template>
   <main class="bg-white w-80 mx-auto p-4 text-center mt-4">
-    <p class="bg-gray-200 py-8 text-4xl font-['Courier_New']">{{ timer }}</p>
+    <p class="bg-gray-200 py-8 text-4xl font-['Courier_New']">
+      {{ minutesTimer }}:{{ secondsTimer }}
+    </p>
     <button
       @click="timeStart"
       :disabled="startToggle"
@@ -72,8 +74,11 @@
 import { ref } from "vue";
 // 共通
 let intervalId = ref("");
-const timer = ref("00:03");
-let inputTimer = ref(3);
+let minutesTimer = ref("01");
+let secondsTimer = ref("00");
+let minutesNumberTimer = ref(Number(minutesTimer.value));
+let secondsNumberTimer = ref(Number(secondsTimer.value));
+let inputTimer = ref(minutesNumberTimer.value * 60 + secondsNumberTimer.value);
 const setTime = ref(inputTimer.value * 1000);
 let endTime = ref("");
 // ボタンの起動・ホバー管理
@@ -84,6 +89,21 @@ const isStop = ref(false);
 const resetToggle = ref(true);
 const isReset = ref(false);
 
+// 初期ボタンメソッド
+const initialBtn = () => {
+  startToggle.value = false;
+  isStart.value = false;
+  stopToggle.value = true;
+  isStop.value = false;
+  resetToggle.value = true;
+  isReset.value = false;
+};
+
+if (minutesNumberTimer.value === 0 && secondsNumberTimer.value === 0) {
+  startToggle.value = true;
+  isStart.value = true;
+}
+
 const check = () => {
   // 残り時間を計算
   let countDown = ref(endTime.value - new Date().getTime());
@@ -93,12 +113,7 @@ const check = () => {
     clearInterval(intervalId.value);
     alert("time up!");
     countDown.value = setTime.value;
-    startToggle.value = false;
-    isStart.value = false;
-    stopToggle.value = true;
-    isStop.value = false;
-    resetToggle.value = true;
-    isReset.value = false;
+    initialBtn();
   }
 
   //   ミリ秒をわかりやすく表示
@@ -109,7 +124,9 @@ const check = () => {
   const minutesFormatted = ref(String(minutes.value).padStart(2, "0"));
   const secondsFormatted = ref(String(seconds.value).padStart(2, "0"));
 
-  timer.value = `${minutesFormatted.value}:${secondsFormatted.value}`;
+  // timer.value = `${minutesFormatted.value}:${secondsFormatted.value}`;
+  minutesTimer.value = minutesFormatted.value;
+  secondsTimer.value = secondsFormatted.value;
 };
 
 // スタートメソッド
@@ -138,12 +155,8 @@ const timeStop = () => {
 
 // リセット処理
 const timeReset = () => {
-  timer.value = "00:03";
-  startToggle.value = false;
-  isStart.value = false;
-  stopToggle.value = true;
-  isStop.value = false;
-  resetToggle.value = true;
-  isReset.value = false;
+  minutesTimer.value = "00";
+  secondsTimer.value = "00";
+  initialBtn();
 };
 </script>
